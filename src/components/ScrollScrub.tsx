@@ -47,9 +47,10 @@ export default function ScrollScrub() {
             setLoaded(done)
             if (done === m.count && !cancelled) setReady(true)
           }
-          img.onload = onDone
-          img.onerror = onDone
           img.src = `/frames/frame_${String(i).padStart(3, '0')}.webp`
+          // Force a full decode up front so scrubbing never hitches decoding a
+          // frame on first paint.
+          img.decode().then(onDone, onDone)
           imgs[i] = img
         }
         imagesRef.current = imgs
@@ -68,6 +69,7 @@ export default function ScrollScrub() {
     let cur = 0
     let target = 0
     let maxScroll = 0
+    let lastIdx = -1
     let raf = 0
 
     const recompute = () => {
@@ -81,6 +83,7 @@ export default function ScrollScrub() {
       canvas.height = Math.round(h * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       recompute()
+      lastIdx = -1
     }
     resize()
     window.addEventListener('resize', resize)
@@ -93,21 +96,26 @@ export default function ScrollScrub() {
       }
       cur += (target - cur) * SMOOTHING
       const p = cur
-      const W = canvas.clientWidth
-      const H = canvas.clientHeight
       const idx = Math.round(p * (manifest.count - 1))
-      const img = imagesRef.current[idx]
-      ctx.fillStyle = '#000'
-      ctx.fillRect(0, 0, W, H)
-      if (img && img.complete && img.naturalWidth) {
-        // cover on portrait screens (phones), contain on landscape (desktop)
-        const cover = W / H <= manifest.aspect + 0.12
-        const s = cover
-          ? Math.max(W / img.naturalWidth, H / img.naturalHeight)
-          : Math.min(W / img.naturalWidth, H / img.naturalHeight)
-        const dw = img.naturalWidth * s
-        const dh = img.naturalHeight * s
-        ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
+      // Only repaint when the frame actually changes — avoids redundant
+      // drawImage every rAF tick and keeps scrolling smooth.
+      if (idx !== lastIdx) {
+        lastIdx = idx
+        const W = canvas.clientWidth
+        const H = canvas.clientHeight
+        const img = imagesRef.current[idx]
+        ctx.fillStyle = '#000'
+        ctx.fillRect(0, 0, W, H)
+        if (img && img.complete && img.naturalWidth) {
+          // cover on portrait screens (phones), contain on landscape (desktop)
+          const cover = W / H <= manifest.aspect + 0.12
+          const s = cover
+            ? Math.max(W / img.naturalWidth, H / img.naturalHeight)
+            : Math.min(W / img.naturalWidth, H / img.naturalHeight)
+          const dw = img.naturalWidth * s
+          const dh = img.naturalHeight * s
+          ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
+        }
       }
       if (barRef.current) barRef.current.style.width = `${p * 100}%`
       let bi = 0
