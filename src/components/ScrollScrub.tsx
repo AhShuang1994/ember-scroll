@@ -127,9 +127,12 @@ export default function ScrollScrub() {
     }
   }, [ready, manifest])
 
+  // Use lvh (large viewport height) so the canvas height stays CONSTANT when the
+  // mobile address bar retracts on first scroll — otherwise `cover` rescales and
+  // the frame appears to zoom in.
   const trackHeight = manifest
-    ? `calc(100dvh + ${manifest.count * PX_PER_FRAME}px)`
-    : '100dvh'
+    ? `calc(100lvh + ${manifest.count * PX_PER_FRAME}px)`
+    : '100lvh'
   const pct = manifest ? Math.round((loaded / manifest.count) * 100) : 0
 
   return (
@@ -150,7 +153,7 @@ export default function ScrollScrub() {
       )}
 
       <div ref={trackRef} style={{ height: trackHeight }} className="relative">
-        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-black">
+        <div className="sticky top-0 h-[100lvh] w-full overflow-hidden bg-black">
           <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
 
           {/* top-left mark */}
