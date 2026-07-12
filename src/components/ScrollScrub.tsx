@@ -5,10 +5,10 @@ type Beat = { at: number; title: string; kicker: string }
 
 // Story beats mapped to scroll progress (0..1). Edit freely.
 const BEATS: Beat[] = [
-  { at: 0.0, title: 'She rests in the quiet dark.', kicker: 'idle' },
-  { at: 0.32, title: 'Energy gathers — drawn toward her.', kicker: 'inflow' },
-  { at: 0.64, title: 'The light pours in.', kicker: 'surge' },
-  { at: 0.9, title: 'She opens her eyes.', kicker: 'awake' },
+  { at: 0.0, title: '你已经很努力了。', kicker: 'exhausted' },
+  { at: 0.32, title: '发帖、回讯息、追流量——从早到晚。', kicker: 'chasing' },
+  { at: 0.64, title: '但生意，还是没有起色。', kicker: 'stuck' },
+  { at: 0.9, title: '也许你缺的不是努力，是一个真正属于你的起点。', kicker: 'awake' },
 ]
 
 const SMOOTHING = 0.2 // validated feel
@@ -148,7 +148,7 @@ export default function ScrollScrub() {
       {!ready && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-black px-8 text-center">
           <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-orange-400/80">
-            Ember
+            H2ODreamer
           </div>
           <div className="h-px w-48 overflow-hidden bg-white/10">
             <div
@@ -166,12 +166,12 @@ export default function ScrollScrub() {
 
           {/* top-left mark */}
           <div className="pointer-events-none absolute left-5 top-5 font-mono text-[11px] uppercase tracking-[0.28em] text-white/70">
-            Ember<span className="text-orange-400">.</span>
+            H2ODreamer<span className="text-orange-400">.</span>
           </div>
 
           {/* story beats */}
           <div className="pointer-events-none absolute inset-x-0 bottom-[16%] px-8">
-            <div className="relative mx-auto flex h-28 max-w-[24ch] items-center justify-center">
+            <div className="relative mx-auto flex h-36 max-w-[20em] items-center justify-center">
               {BEATS.map((b, i) => (
                 <div
                   key={i}
@@ -181,7 +181,7 @@ export default function ScrollScrub() {
                       : 'translate-y-3 opacity-0'
                   }`}
                 >
-                  <p className="text-2xl font-medium leading-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.7)] sm:text-3xl">
+                  <p className="text-2xl font-medium leading-snug text-balance text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.7)] sm:text-3xl">
                     {b.title}
                   </p>
                   <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-orange-400">
