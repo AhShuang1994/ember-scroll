@@ -33,7 +33,10 @@ export default function ScrollScrub() {
   // Load manifest + preload every frame before enabling the scrub.
   useEffect(() => {
     let cancelled = false
-    fetch('/frames.json')
+    // Pick the frame set by viewport: portrait phones get the 9:16 set,
+    // landscape desktops get the 16:9 set.
+    const dir = window.innerWidth >= window.innerHeight ? 'frames-desktop' : 'frames'
+    fetch(`/${dir}.json`)
       .then((r) => r.json())
       .then((m: Manifest) => {
         if (cancelled) return
@@ -47,7 +50,7 @@ export default function ScrollScrub() {
             setLoaded(done)
             if (done === m.count && !cancelled) setReady(true)
           }
-          img.src = `/frames/frame_${String(i).padStart(3, '0')}.webp`
+          img.src = `/${dir}/frame_${String(i).padStart(3, '0')}.webp`
           // Force a full decode up front so scrubbing never hitches decoding a
           // frame on first paint.
           img.decode().then(onDone, onDone)
