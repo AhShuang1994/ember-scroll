@@ -110,11 +110,10 @@ export default function ScrollScrub() {
         ctx.fillStyle = '#000'
         ctx.fillRect(0, 0, W, H)
         if (img && img.complete && img.naturalWidth) {
-          // cover on portrait screens (phones), contain on landscape (desktop)
-          const cover = W / H <= manifest.aspect + 0.12
-          const s = cover
-            ? Math.max(W / img.naturalWidth, H / img.naturalHeight)
-            : Math.min(W / img.naturalWidth, H / img.naturalHeight)
+          // Always cover: fill the whole viewport (full-bleed), cropping the
+          // overflow. Both frame sets are near-black at the edges, so a slight
+          // crop is invisible.
+          const s = Math.max(W / img.naturalWidth, H / img.naturalHeight)
           const dw = img.naturalWidth * s
           const dh = img.naturalHeight * s
           ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
